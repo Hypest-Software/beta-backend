@@ -1,0 +1,1 @@
+web: gunicorn beta_backend.wsgi
