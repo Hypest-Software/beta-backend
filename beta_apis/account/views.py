@@ -5,9 +5,9 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, mixins
-from rest_framework_jwt.settings import api_settings
-from .serializers import AuthUserSerializer
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from beta_apis.jwt_utils import encode_jwt
+from .serializers import AuthUserSerializer, AccountUpdateInfoSerializer
+from beta_apis.permissions import IsLoggedIn
 
 class UserRegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -42,7 +42,6 @@ class UserRegisterAPIView(generics.CreateAPIView):
 class UserLoginAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = AuthUserSerializer
-#    authentication_classes = [JSONWebTokenAuthentication,]
 
     @swagger_auto_schema(
         request_body=AuthUserSerializer,
@@ -61,12 +60,50 @@ class UserLoginAPIView(generics.CreateAPIView):
         user = User.objects.filter(username=username).first()
         if not user or not check_password(password, user.password):
             return FailedResponse(status_message='Login failed. Invalid username or password.')
-        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        payload = jwt_payload_handler(user)
-        token = jwt_encode_handler(payload)
+        print(user.id)
+        token = encode_jwt(str(user.id))
         return SuccessResponse(status_message='Success', data={
             "token": token,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "photo": user.photo
+        })
+
+
+class UserUpdateInfoAPIView(generics.CreateAPIView):
+    serializer_class = AccountUpdateInfoSerializer
+    permission_classes = [IsLoggedIn, ]
+    @swagger_auto_schema(
+        request_body=AccountUpdateInfoSerializer,
+        responses={
+            200: DefaultResponseSerializer,
+        },
+        tags=['account'],
+        operation_id='Update account information'
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return FailedResponse(status_message='Invalid request')
+        email = serializer.data.get('email')
+        first_name = serializer.data.get('first_name')
+        last_name = serializer.data.get('last_name')
+        full_name = serializer.data.get('full_name')
+        user = request.user
+        if email:
+            if '.' in email and '@' in email:
+                user.email = email
+            else:
+                return FailedResponse(status_message='Email address is not valid')
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
+        if full_name:
+            user.full_name = full_name
+        user.save()
+        return SuccessResponse(status_message='Success',data={
             "username": user.username,
             "email": user.email,
             "full_name": user.full_name,
