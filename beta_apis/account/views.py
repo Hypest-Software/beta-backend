@@ -6,15 +6,15 @@ from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, mixins
 from rest_framework_jwt.settings import api_settings
-from .serializers import CreateUserSerializer
+from .serializers import AuthUserSerializer
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 class UserRegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
+    serializer_class = AuthUserSerializer
 
     @swagger_auto_schema(
-        request_body=CreateUserSerializer,
+        request_body=AuthUserSerializer,
         responses={
             200: DefaultResponseSerializer,
         },
@@ -41,11 +41,11 @@ class UserRegisterAPIView(generics.CreateAPIView):
 
 class UserLoginAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
+    serializer_class = AuthUserSerializer
 #    authentication_classes = [JSONWebTokenAuthentication,]
 
     @swagger_auto_schema(
-        request_body=CreateUserSerializer,
+        request_body=AuthUserSerializer,
         responses={
             200: DefaultResponseSerializer,
         },
