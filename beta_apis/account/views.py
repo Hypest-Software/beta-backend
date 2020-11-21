@@ -1,11 +1,13 @@
-from .serializers import CreateUserSerializer
-from rest_framework import mixins
-from rest_framework import generics
+from beta_apis.constants import (DefaultResponseSerializer, FailedResponse,
+                                 SuccessResponse)
 from beta_apis.models import User
-from beta_apis.constants import SuccessResponse, FailedResponse, DefaultResponseSerializer
-from django.contrib.auth.hashers import make_password, check_password
-from drf_yasg.utils import swagger_auto_schema
+from django.contrib.auth.hashers import check_password, make_password
 from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, mixins
+
+from .serializers import CreateUserSerializer
+
 
 class UserRegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -14,7 +16,7 @@ class UserRegisterAPIView(generics.CreateAPIView):
     @swagger_auto_schema(
         request_body=CreateUserSerializer,
         responses={
-            200: 'Ok',
+            200: DefaultResponseSerializer,
         },
         tags=['account'],
         operation_id='Create new account'

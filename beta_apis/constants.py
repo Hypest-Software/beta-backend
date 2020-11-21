@@ -45,4 +45,4 @@ class DefaultResponseSerializer(serializers.Serializer):
     statusCode = serializers.IntegerField()
     statusMessage = serializers.CharField()
     data = serializers.Field()
-    
+
