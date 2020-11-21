@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 from django.contrib.auth.models import AnonymousUser
 from .jwt_utils import decode_jwt
-from .models import User
+from .models import Users
 
 
 def check_jwt_token(token):
@@ -12,7 +12,7 @@ def check_jwt_token(token):
     if user_id is None:
         return False, "user id is none"
     # check if this user_id is existing
-    user = User.objects.filter(id=user_id).first()
+    user = Users.objects.filter(id=user_id).first()
     if user is None:
         return False, "user is not found or active"
 

@@ -1,6 +1,6 @@
 from beta_apis.constants import (DefaultResponseSerializer, FailedResponse,
                                  SuccessResponse)
-from beta_apis.models import User
+from beta_apis.models import Users
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
@@ -10,7 +10,7 @@ from .serializers import AuthUserSerializer, AccountUpdateInfoSerializer
 from beta_apis.permissions import IsLoggedIn
 
 class UserRegisterAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = Users.objects.all()
     serializer_class = AuthUserSerializer
 
     @swagger_auto_schema(
@@ -27,20 +27,20 @@ class UserRegisterAPIView(generics.CreateAPIView):
             return FailedResponse(status_message='Invalid request')
         username = serializer.data.get('username')
         password = serializer.data.get('password')
-        if not User.validate_username(username):
+        if not Users.validate_username(username):
             return FailedResponse(status_message='Username is not valid')
-        user = User.objects.filter(username=username)
+        user = Users.objects.filter(username=username)
         if user:
             return FailedResponse(status_message='Username is not available')
-        if not User.validate_password(password):
+        if not Users.validate_password(password):
             return FailedResponse(status_message='Password is not valid')
-        user = User(username=username, password=make_password(password))
+        user = Users(username=username, password=make_password(password))
         user.save()
         return SuccessResponse(status_message='Success')
 
 
 class UserLoginAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = Users.objects.all()
     serializer_class = AuthUserSerializer
 
     @swagger_auto_schema(
@@ -57,7 +57,7 @@ class UserLoginAPIView(generics.CreateAPIView):
             return FailedResponse(status_message='Invalid request')
         username = serializer.data.get('username')
         password = serializer.data.get('password')
-        user = User.objects.filter(username=username).first()
+        user = Users.objects.filter(username=username).first()
         if not user or not check_password(password, user.password):
             return FailedResponse(status_message='Login failed. Invalid username or password.')
         print(user.id)

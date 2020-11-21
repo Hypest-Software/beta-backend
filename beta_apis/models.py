@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 
 # Create your models here.
-class User(models.Model):
+class Users(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = models.CharField(max_length=255, null=False, blank=False)
     password = models.CharField(max_length=200, null=False, blank=False)
@@ -13,6 +13,9 @@ class User(models.Model):
     photo = models.CharField(max_length=200, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'users'
 
     @classmethod
     def validate_username(cls, username):
@@ -27,3 +30,14 @@ class User(models.Model):
         if len(password) < 6:
             return False
         return True
+
+
+class ReportPhoto(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=255, null=False, blank=False)
+    public_url = models.CharField(max_length=255, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'report_photo'

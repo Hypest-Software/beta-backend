@@ -1,7 +1,7 @@
 from django.contrib import admin
-from beta_apis.models import User
+from beta_apis.models import Users
 # Register your models here.
-@admin.register(User)
+@admin.register(Users)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'username',

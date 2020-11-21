@@ -135,6 +135,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+GCP_PROJECT_ID = env('GCP_PROJECT_ID')
+GCP_BUCKET_NAME = env('GCP_BUCKET_NAME')
+GCP_AUTH = env('GCP_AUTH')
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

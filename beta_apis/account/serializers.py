@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from beta_apis.models import User
+from beta_apis.models import Users
 
 
 class AuthUserSerializer(serializers.Serializer):

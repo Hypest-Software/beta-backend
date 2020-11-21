@@ -5,7 +5,7 @@ from django.conf import settings
 import jwt
 from rest_framework import authentication, exceptions
 
-from beta_apis.models import User
+from beta_apis.models import Users
 
 logger = logging.getLogger(__name__)
 
@@ -91,8 +91,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
             msg = 'Invalid authentication.'
             raise exceptions.AuthenticationFailed(msg)
         try:
-            user = User.objects.get(pk=payload['sub'])
-        except User.DoesNotExist:
+            user = Users.objects.get(pk=payload['sub'])
+        except Users.DoesNotExist:
             msg = 'No user matching this token was found.'
             raise exceptions.AuthenticationFailed(msg)
         return (user, token)
