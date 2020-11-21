@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, mixins
 from beta_apis.jwt_utils import encode_jwt
-from .serializers import SubmitReportSerializer, ReportSerializer, UploadPhotoSerializer
+from .serializers import SubmitReportSerializer, ReportSerializer, UploadPhotoSerializer, ReportPhotoSerializer
 from beta_apis.permissions import IsLoggedIn
 from gcloud import storage
 from oauth2client.service_account import ServiceAccountCredentials
@@ -31,6 +31,7 @@ class SendReportAPIView(generics.CreateAPIView):
         if not serializer.is_valid():
             return FailedResponse(status_message='Invalid request')
         report = Report(
+            user_id = request.user.id,
             latitude = request.data["latitude"],
             longitude = request.data["longitude"],
             describe = request.data["describe"],
@@ -81,3 +82,33 @@ class UploadPhotoAPIView(generics.CreateAPIView):
             "public_url": blob.public_url
         })
 
+
+class ListMyReportAPIView(generics.ListAPIView):
+    permission_classes = [IsLoggedIn, ]
+    @swagger_auto_schema(
+        responses={
+            200: DefaultResponseSerializer,
+        },
+        tags=['report'],
+        operation_id='Get all report of current acccount'
+    )
+    def get(self, request, *args, **kwargs):
+        reports = ReportSerializer(Report.objects.filter(user_id=request.user.id), many=True).data
+        for report in reports:
+            photos = ReportPhoto.objects.filter(report_id=report["id"])
+            report['photo'] = ReportPhotoSerializer(photos, many=True).data
+        return SuccessResponse(status_message='Success',data=reports)
+
+
+class ListAllReportAPIView(generics.ListAPIView):
+    permission_classes = [IsLoggedIn, ]
+    @swagger_auto_schema(
+        responses={
+            200: DefaultResponseSerializer,
+        },
+        tags=['report'],
+        operation_id='Get all report of current acccount'
+    )
+    def get(self, request, *args, **kwargs):
+        reports = ReportSerializer(Report.objects.all(), many=True).data
+        return SuccessResponse(status_message='Success',data=reports)

@@ -35,6 +35,7 @@ class Users(models.Model):
 
 class Report(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=255, null=False, blank=False)
     latitude = models.FloatField(null=False, blank=False)
     longitude = models.FloatField(null=False, blank=False)
     describe = models.CharField(max_length=255, null=True, blank=True)
