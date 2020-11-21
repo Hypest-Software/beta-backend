@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-
+from rest_framework import serializers
 
 class FailedResponse(Response):
     response_data = {
@@ -38,3 +38,11 @@ class SuccessResponse(Response):
 class RawResponse(Response):
     def __init__(self, data=None, **kwargs):
         super().__init__(data, **kwargs)
+
+
+class DefaultResponseSerializer(serializers.Serializer):
+    success = serializers.BooleanField()
+    statusCode = serializers.IntegerField()
+    statusMessage = serializers.CharField()
+    data = serializers.Field()
+    
