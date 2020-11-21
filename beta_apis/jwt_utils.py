@@ -41,20 +41,3 @@ def detect_lang(lang_header):
 def jwt_decode(token):
     return jwt.decode(token, b64decode(settings.JWT_ENCRYPT_KEY))
 
-
-def generate_blog_api_token():
-    iat = int(time.time())
-    exp = iat + 31556926 * 10
-    iss = settings.BLOG_JOBHOP_URL
-    data = dict(
-        iss=iss,
-        iat=iat,
-        nbf=iat,
-        exp=exp,
-        data=dict(
-            user=dict(
-                id=2
-            )
-        )
-    )
-    return jwt.encode(data, settings.BLOG_JWT_AUTH_SECRET_KEY)
