@@ -5,9 +5,9 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, mixins
-
+from rest_framework_jwt.settings import api_settings
 from .serializers import CreateUserSerializer
-
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 class UserRegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -37,3 +37,38 @@ class UserRegisterAPIView(generics.CreateAPIView):
         user = User(username=username, password=make_password(password))
         user.save()
         return SuccessResponse(status_message='Success')
+
+
+class UserLoginAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = CreateUserSerializer
+#    authentication_classes = [JSONWebTokenAuthentication,]
+
+    @swagger_auto_schema(
+        request_body=CreateUserSerializer,
+        responses={
+            200: DefaultResponseSerializer,
+        },
+        tags=['account'],
+        operation_id='Account login'
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return FailedResponse(status_message='Invalid request')
+        username = serializer.data.get('username')
+        password = serializer.data.get('password')
+        user = User.objects.filter(username=username).first()
+        if not user or not check_password(password, user.password):
+            return FailedResponse(status_message='Login failed. Invalid username or password.')
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+        return SuccessResponse(status_message='Success', data={
+            "token": token,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "photo": user.photo
+        })
