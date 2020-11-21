@@ -42,7 +42,7 @@ class IsLoggedIn(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return bool(request.user and type(request.user) is User)
+        return bool(request.user and type(request.user) is Users)
 
 
 class IsLoggedInOrNone(BasePermission):
@@ -51,4 +51,4 @@ class IsLoggedInOrNone(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return bool(request.user is None or (request.user and type(request.user) is User))
+        return bool(request.user is None or (request.user and type(request.user) is Users))

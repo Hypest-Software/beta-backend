@@ -16,6 +16,7 @@ class Users(models.Model):
 
     class Meta:
         db_table = 'users'
+        verbose_name_plural = 'Users'
 
     @classmethod
     def validate_username(cls, username):
@@ -32,8 +33,22 @@ class Users(models.Model):
         return True
 
 
+class Report(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    latitude = models.FloatField(null=False, blank=False)
+    longitude = models.FloatField(null=False, blank=False)
+    describe = models.CharField(max_length=255, null=True, blank=True)
+    is_public = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'report'
+        verbose_name_plural = 'Reports'
+
 class ReportPhoto(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    report_id = models.CharField(max_length=255, null=True, blank=True)
     user_id = models.CharField(max_length=255, null=False, blank=False)
     public_url = models.CharField(max_length=255, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -41,3 +56,4 @@ class ReportPhoto(models.Model):
 
     class Meta:
         db_table = 'report_photo'
+        verbose_name_plural = 'Report Photos'
