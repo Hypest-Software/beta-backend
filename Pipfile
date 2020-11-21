@@ -12,6 +12,9 @@ django-environ = "*"
 djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
+pyyaml = "*"
+uritemplate = "*"
+drf-yasg = "*"
 
 [requires]
 python_version = "3.8"
