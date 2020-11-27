@@ -5,8 +5,8 @@ from beta_apis.models import Report, ReportPhoto
 class SubmitReportSerializer(serializers.Serializer):
     latitude = serializers.FloatField(required=True)
     longitude = serializers.FloatField(required=True)
-    is_public = serializers.BooleanField(required=False, default=True)
-    describe = serializers.CharField(required=False, default=None)
+    is_public = serializers.BooleanField(required=False, allow_null=True, default=True)
+    describe = serializers.CharField(required=False, allow_null=True, default=None)
 
 class ReportSerializer(serializers.ModelSerializer):
     photo = serializers.SerializerMethodField()

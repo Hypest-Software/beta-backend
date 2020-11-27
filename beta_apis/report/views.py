@@ -36,14 +36,13 @@ class SendReportAPIView(generics.CreateAPIView):
         geolocator = Nominatim(user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36")
         location = geolocator.reverse(f'{request.data["latitude"]}, {request.data["longitude"]}')
         address = split_data(location)["powiat"]
-        print(address)
 
         report = Report(
             user_id = request.user.id,
-            latitude = request.data["latitude"],
-            longitude = request.data["longitude"],
-            describe = request.data["describe"],
-            is_public = request.data["is_public"],
+            latitude = serializer.data.get('latitude'),
+            longitude = serializer.data.get('longitude'),
+            describe = serializer.data.get('describe'),
+            is_public = serializer.data.get('is_public'),
             address = address
         )
         report.save()
