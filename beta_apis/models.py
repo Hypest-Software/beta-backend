@@ -42,6 +42,7 @@ class Report(models.Model):
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    address = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = 'report'

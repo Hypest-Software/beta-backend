@@ -14,6 +14,7 @@ from django.conf import settings
 import os
 import base64
 import json
+from geopy.geocoders import Nominatim
 
 class SendReportAPIView(generics.CreateAPIView):
     serializer_class = SubmitReportSerializer
@@ -30,12 +31,20 @@ class SendReportAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return FailedResponse(status_message='Invalid request')
+
+
+        geolocator = Nominatim(user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.67 Safari/537.36")
+        location = geolocator.reverse(f'{request.data["latitude"]}, {request.data["longitude"]}')
+        address = split_data(location)["powiat"]
+        print(address)
+
         report = Report(
             user_id = request.user.id,
             latitude = request.data["latitude"],
             longitude = request.data["longitude"],
             describe = request.data["describe"],
-            is_public = request.data["is_public"]
+            is_public = request.data["is_public"],
+            address = address
         )
         report.save()
         return SuccessResponse(status_message='Success', data=ReportSerializer(report).data)
@@ -76,7 +85,6 @@ class UploadPhotoAPIView(generics.CreateAPIView):
 
         record.public_url = blob.public_url
         record.save()
-
         return SuccessResponse(status_message='Success',data= {
             "photo_id": record.id,
             "public_url": blob.public_url
@@ -112,3 +120,49 @@ class ListAllReportAPIView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         reports = ReportSerializer(Report.objects.all(), many=True).data
         return SuccessResponse(status_message='Success',data=reports)
+
+
+def find_nearby_powiat(cords: str):
+    cords = list(map(float, cords.split(", ")))
+    for i in range(-10, 10):
+        for j in range(-10, 10):
+            if i < 0:
+                x =  float("-0.0000" + str(i)[1:])
+            else:
+                x = float("0.0000" + str(i))
+            if j < 0:
+                y =  float("-0.0000" + str(j)[1:])
+            else:
+                y = float("0.0000" + str(j))
+            test_loc = geolocator.reverse(f"{cords[0]+x}, {cords[1]+y}")
+            test_loc = str(test_loc).split(", ")
+            if len(test_loc) == 7:
+                print(i,j)
+                return None
+    print(len(test_loc))
+    
+
+
+def split_data(data: str):
+    data = str(data)
+    data = data.split(",")
+    for data_index, d in enumerate(data):
+        data[data_index] = d.strip()
+    print()
+    if len(data) != 7:
+        empty_result = {"kraj": "",
+                        "wojewodztwo": "",
+                        "powiat": "",
+                        "gmina": "",
+                        "kod_pocztowy": "",
+                        "miejscowossc": "",
+                        "ulica": ""}
+        return empty_result
+    result = {"kraj": data[-1],
+              "wojewodztwo": data[-3],
+              "powiat": data[-4],
+              "gmina": data[-5],
+              "kod_pocztowy": data[-2],
+              "miejscowossc": data[-6],
+              "ulica": data[-7]}
+    return result

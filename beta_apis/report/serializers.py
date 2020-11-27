@@ -6,7 +6,7 @@ class SubmitReportSerializer(serializers.Serializer):
     latitude = serializers.FloatField(required=True)
     longitude = serializers.FloatField(required=True)
     is_public = serializers.BooleanField(required=False, default=True)
-    describe = serializers.CharField(required=False)
+    describe = serializers.CharField(required=False, default=None)
 
 class ReportSerializer(serializers.ModelSerializer):
     photo = serializers.SerializerMethodField()
@@ -16,7 +16,7 @@ class ReportSerializer(serializers.ModelSerializer):
         return ReportPhotoSerializer(photos, many=True).data
     class Meta:
         model = Report
-        fields = ['id', 'latitude', 'longitude', 'describe', 'is_public', 'photo', 'created_at', 'updated_at']
+        fields = ['id', 'latitude', 'longitude', 'address', 'describe', 'is_public', 'photo', 'created_at', 'updated_at']
 
 
 class ReportPhotoSerializer(serializers.ModelSerializer):

@@ -17,6 +17,7 @@ uritemplate = "*"
 drf-yasg = "*"
 djangorestframework-jwt = "*"
 gcloud = "*"
+geopy = "*"
 
 [requires]
 python_version = "3.8"
